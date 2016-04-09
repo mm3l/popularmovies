@@ -1,11 +1,14 @@
 package com.mmel.popularmovies.app;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * It represents a movie element got from TheMovieDB
  *
  * @author michael.melachridis@gmail.com
  */
-public class Movie {
+public class Movie implements Parcelable {
 
     private String posterPath;
     private String title;
@@ -20,6 +23,40 @@ public class Movie {
         this.releaseDate = releaseDate;
         this.voteAverage = voteAverage;
         this.overview = overview;
+    }
+
+    protected Movie(Parcel in) {
+        posterPath = in.readString();
+        title = in.readString();
+        releaseDate = in.readString();
+        voteAverage = in.readDouble();
+        overview = in.readString();
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(posterPath);
+        dest.writeString(title);
+        dest.writeString(releaseDate);
+        dest.writeDouble(voteAverage);
+        dest.writeString(overview);
     }
 
     public enum ImageSize {
@@ -57,5 +94,20 @@ public class Movie {
 
     public String getOverview() {
         return overview;
+    }
+
+    /**
+     * It returns a string representation of all local attributes
+     * which constitute the Movie Object
+     *
+     * @return  a string representation of all local attributes
+     */
+    public String toString() {
+        String str = "Poster Path: " + getPosterPath() + " \n" +
+                "Original Title: " + getTitle() + " \n" +
+                "Release Date: " + getReleaseDate() + " \n" +
+                "Average Vote: " + getVoteAverage() + " \n" +
+                "Overview: " + getOverview() + " \n";
+        return  str;
     }
 }
