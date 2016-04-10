@@ -1,4 +1,4 @@
-package com.mmel.popularmovies.app;
+package com.mmel.popularmovies.app.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -11,26 +11,32 @@ import android.os.Parcelable;
 public class Movie implements Parcelable {
 
     private String posterPath;
+    private String backdrop_path;
     private String title;
     private String releaseDate;
     private double voteAverage;
     private String overview;
+    private String videos;
 
-    public Movie(String posterPath, String title, String releaseDate,
-                     double voteAverage, String overview) {
+    public Movie(String posterPath, String backdrop_path, String title, String releaseDate,
+                 double voteAverage, String overview /*String videos*/) {
         this.posterPath = posterPath;
+        this.backdrop_path = backdrop_path;
         this.title = title;
         this.releaseDate = releaseDate;
         this.voteAverage = voteAverage;
         this.overview = overview;
+        this.videos = "";
     }
 
     protected Movie(Parcel in) {
         posterPath = in.readString();
+        backdrop_path = in.readString();
         title = in.readString();
         releaseDate = in.readString();
         voteAverage = in.readDouble();
         overview = in.readString();
+        videos = in.readString();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -53,10 +59,12 @@ public class Movie implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(posterPath);
+        dest.writeString(backdrop_path);
         dest.writeString(title);
         dest.writeString(releaseDate);
         dest.writeDouble(voteAverage);
         dest.writeString(overview);
+        dest.writeString(videos);
     }
 
     public enum ImageSize {
@@ -80,6 +88,10 @@ public class Movie implements Parcelable {
         return posterPath;
     }
 
+    public String getBackdropPath() {
+        return backdrop_path;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -96,6 +108,8 @@ public class Movie implements Parcelable {
         return overview;
     }
 
+    public String getVideos() { return  videos; }
+
     /**
      * It returns a string representation of all local attributes
      * which constitute the Movie Object
@@ -104,10 +118,12 @@ public class Movie implements Parcelable {
      */
     public String toString() {
         String str = "Poster Path: " + getPosterPath() + " \n" +
+                "BackDrop Path: " + getBackdropPath() + " \n" +
                 "Original Title: " + getTitle() + " \n" +
                 "Release Date: " + getReleaseDate() + " \n" +
                 "Average Vote: " + getVoteAverage() + " \n" +
-                "Overview: " + getOverview() + " \n";
+                "Overview: " + getOverview() + " \n" +
+                "Videos: " + getVideos() + " \n";
         return  str;
     }
 }

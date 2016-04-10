@@ -4,8 +4,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.mmel.popularmovies.app.BuildConfig;
-import com.mmel.popularmovies.app.HttpRequest;
-import com.mmel.popularmovies.app.Movie;
+import com.mmel.popularmovies.app.data.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,6 +48,7 @@ public class TheMovieDbApi {
     private static final String RELEASE_DATE = "release_date";
     private static final String VOTE_AVERAGE = "vote_average";
     private static final String OVERVIEW = "overview";
+    private static final String VIDEOS = "videos";
 
     public enum SortOption {
         SORT_BY_MOST_POPULAR,
@@ -114,10 +114,12 @@ public class TheMovieDbApi {
                 JSONObject movieInfoJson = results.getJSONObject(i);
                 movies.add(new Movie(
                         movieInfoJson.getString(POSTER_PATH),
+                        movieInfoJson.getString(BACKDROP_PATH),
                         movieInfoJson.getString(ORIGINAL_TITLE),
                         movieInfoJson.getString(RELEASE_DATE),
                         movieInfoJson.getDouble(VOTE_AVERAGE),
                         movieInfoJson.getString(OVERVIEW)
+/*                        movieInfoJson.getString(VIDEOS)*/
                 ));
             }
         } catch (JSONException e) {

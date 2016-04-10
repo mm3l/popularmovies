@@ -10,7 +10,6 @@
         <item>@string/pref_sort_label_top</item>
         <item>@string/pref_sort_label_rating</item>
         <item>@string/pref_sort_label_revenue</item>
-        <item>@string/pref_sort_label_release_date</item>
     </string-array>
 
     <string-array name="pref_sort_values">
@@ -18,7 +17,6 @@
         <item>@string/pref_sort_top_rated</item>
         <item>@string/pref_sort_rating</item>
         <item>@string/pref_sort_revenue</item>
-        <item>@string/pref_sort_release_date</item>
     </string-array>
 
 </resources>

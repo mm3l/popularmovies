@@ -1,4 +1,4 @@
-package com.mmel.popularmovies.app;
+package com.mmel.popularmovies.app.api;
 
 import android.util.Log;
 

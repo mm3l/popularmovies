@@ -1,14 +1,14 @@
-package com.mmel.popularmovies.app;
+package com.mmel.popularmovies.app.data;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import com.mmel.popularmovies.app.R;
 import com.mmel.popularmovies.app.api.TheMovieDbApi;
 import com.squareup.picasso.Picasso;
 

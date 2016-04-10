@@ -1,11 +1,11 @@
 package com.mmel.popularmovies.app;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +18,8 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.mmel.popularmovies.app.api.TheMovieDbApi;
+import com.mmel.popularmovies.app.data.CustomArrayAdapter;
+import com.mmel.popularmovies.app.data.Movie;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,7 +62,15 @@ public class MoviesFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_refresh) {
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
 
+                    Toast.makeText(getActivity().getApplicationContext(),
+                            "Fetching data...",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+            updateMovies();
             return true;
         }
 
@@ -78,7 +88,6 @@ public class MoviesFragment extends Fragment {
         sortKeyMap.put(getActivity().getString(R.string.pref_sort_top_rated), TheMovieDbApi.SortOption.SORT_BY_TOP_RATED);
         sortKeyMap.put(getActivity().getString(R.string.pref_sort_rating), TheMovieDbApi.SortOption.SORT_BY_HIGHEST_RATED);
         sortKeyMap.put(getActivity().getString(R.string.pref_sort_revenue), TheMovieDbApi.SortOption.SORT_BY_REVENUE);
-        sortKeyMap.put(getActivity().getString(R.string.pref_sort_release_date), TheMovieDbApi.SortOption.SORT_BY_RELEASE_DATE);
 
         ArrayAdapter<CharSequence> sortAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.sort_options, android.R.layout.simple_spinner_item);
@@ -93,13 +102,10 @@ public class MoviesFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Toast.makeText(getActivity(), mMoviesAdapter.getItem(position).getTitle(),
-                        Toast.LENGTH_SHORT).show();
-
-                /*Movie movie = mMoviesAdapter.getItem(position);
+                Movie movie = mMoviesAdapter.getItem(position);
                 Intent intent = new Intent(parent.getContext(), DetailActivity.class);
-                intent.putExtra("movie_info", movieInfo);
-                startActivity(intent);*/
+                intent.putExtra(DetailFragment.DETAIL_MOVIE_KEY, movie);
+                startActivity(intent);
             }
         });
 
@@ -109,7 +115,6 @@ public class MoviesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(LOG_TAG, "onStart()");
         updateMovies();
     }
 
@@ -120,7 +125,7 @@ public class MoviesFragment extends Fragment {
         String sort_pref = prefs.getString(getString(R.string.pref_sort_key),
                 getString(R.string.pref_sort_popular));
 
-        Log.d(LOG_TAG, "updateMovies(): " + "Selection: " + sort_pref);
+        //Log.d(LOG_TAG, "updateMovies(): " + "Selection: " + sort_pref);
 
         movieTask.execute(sort_pref);
     }
@@ -136,18 +141,9 @@ public class MoviesFragment extends Fragment {
 
             ArrayList<Movie> movies;
 
-            getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-
-                    Toast.makeText(getActivity().getApplicationContext(),
-                            "Fetching data...",
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
-
             TheMovieDbApi.SortOption sortOption = sortKeyMap.get(params[0]);
 
-            Log.d(LOG_TAG, "FetchMoviesTask: " + sortOption);
+            //Log.d(LOG_TAG, "FetchMoviesTask: " + sortOption);
 
             movies = api.discoverMovies(
                     sortOption != null ? sortOption : TheMovieDbApi.SortOption.SORT_BY_MOST_POPULAR);
