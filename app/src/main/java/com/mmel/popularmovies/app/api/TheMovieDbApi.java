@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.mmel.popularmovies.app.BuildConfig;
 import com.mmel.popularmovies.app.data.Movie;
+import com.mmel.popularmovies.app.data.Trailer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +27,10 @@ public class TheMovieDbApi {
     private static final String IMAGE_URL_BASE = "http://image.tmdb.org/t/p/";
     private static final String API_URL_BASE = "http://api.themoviedb.org/3/";
     private static final String ENDPOINT_DISCOVER_MOVIE = "discover/movie";
+    private static final String ENDPOINT_MOVIE = "movie/";
+    private static final String VIDEOS = "/videos";
+
+    private static final String VIDEO_URL_BASE = "https://www.youtube.com/watch";
 
     /* Required API parameters */
     private static final String API_KEY = "api_key";
@@ -44,11 +49,16 @@ public class TheMovieDbApi {
     private static final String BACKDROP_PATH = "backdrop_path";
     private static final String POSTER_PATH = "poster_path";
 
+    private static final String MOVIE_ID = "id";
     private static final String ORIGINAL_TITLE = "original_title";
     private static final String RELEASE_DATE = "release_date";
     private static final String VOTE_AVERAGE = "vote_average";
     private static final String OVERVIEW = "overview";
-    private static final String VIDEOS = "videos";
+
+    private static final String TRAILER_ID = "id";
+    private static final String TRAILER_KEY = "key";
+    private static final String TRAILER_NAME = "name";
+    private static final String TRAILER_SIZE = "size";
 
     public enum SortOption {
         SORT_BY_MOST_POPULAR,
@@ -60,6 +70,52 @@ public class TheMovieDbApi {
 
     public TheMovieDbApi() {
 
+    }
+
+    public ArrayList<Trailer> getMovieTrailers(int movieId) {
+        ArrayList<Trailer> trailers = new ArrayList<Trailer>();
+
+        Uri uri = Uri.parse(API_URL_BASE + ENDPOINT_MOVIE + movieId + VIDEOS).buildUpon()
+                .appendQueryParameter(API_KEY, BuildConfig.THE_MOVIE_DB_API_KEY)
+                .build();
+
+        Log.d(LOG_TAG, "json query: " + uri.toString());
+
+        HttpRequest.Response response = HttpRequest.get(uri.toString());
+
+        if (response == null) {
+            return null;
+        }
+
+        JSONObject discoverTrailersJson;
+        try {
+            discoverTrailersJson = response.json();
+
+            Log.d(LOG_TAG, "json response: " + discoverTrailersJson.toString());
+
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, ENDPOINT_MOVIE + " came back with invalid JSON: \n"
+                    + response.text);
+            return null;
+        }
+
+        try {
+            JSONArray results = discoverTrailersJson.getJSONArray("results");
+            for (int i = 0; i < results.length(); i++) {
+                JSONObject trailerInfoJson = results.getJSONObject(i);
+                trailers.add(new Trailer(movieId,
+                        trailerInfoJson.getString(TRAILER_ID),
+                        trailerInfoJson.getString(TRAILER_KEY),
+                        trailerInfoJson.getString(TRAILER_NAME),
+                        trailerInfoJson.getInt(TRAILER_SIZE)
+                ));
+            }
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, ENDPOINT_MOVIE + " discoverTrailersJson not expected format: \n" + discoverTrailersJson.toString());
+            return null;
+        }
+
+        return trailers;
     }
 
     public ArrayList<Movie> discoverMovies(SortOption sort) {
@@ -113,13 +169,13 @@ public class TheMovieDbApi {
             for (int i = 0; i < results.length(); i++) {
                 JSONObject movieInfoJson = results.getJSONObject(i);
                 movies.add(new Movie(
+                        movieInfoJson.getInt(MOVIE_ID),
                         movieInfoJson.getString(POSTER_PATH),
                         movieInfoJson.getString(BACKDROP_PATH),
                         movieInfoJson.getString(ORIGINAL_TITLE),
                         movieInfoJson.getString(RELEASE_DATE),
                         movieInfoJson.getDouble(VOTE_AVERAGE),
                         movieInfoJson.getString(OVERVIEW)
-/*                        movieInfoJson.getString(VIDEOS)*/
                 ));
             }
         } catch (JSONException e) {
@@ -131,5 +187,14 @@ public class TheMovieDbApi {
 
     public static String getImageUrl(String imageName, Movie.ImageSize imageSize) {
         return IMAGE_URL_BASE + imageSize.toString() + imageName;
+    }
+
+    public static Uri getTrailerUri(String key) {
+        Uri uri = Uri.parse(VIDEO_URL_BASE).buildUpon()
+                .appendQueryParameter("v", key)
+                .build();
+
+        Log.d(LOG_TAG, "getTrailerUri: " + uri.toString());
+        return uri;
     }
 }

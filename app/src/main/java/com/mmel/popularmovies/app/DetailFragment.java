@@ -1,6 +1,7 @@
 package com.mmel.popularmovies.app;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -12,7 +13,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -96,6 +99,16 @@ public class DetailFragment extends Fragment {
                     .load(TheMovieDbApi.getImageUrl(movie.getBackdropPath(), Movie.ImageSize.w500))
                             .into(backDropImgView);
 
+            backDropImgView.setOnClickListener(new View.OnClickListener() {
+
+                public void onClick(View v) {
+
+                    startActivity(new Intent(Intent.ACTION_VIEW, TheMovieDbApi.getTrailerUri(movie.getTrailers().get(0).getKey())));
+                    Log.d("Video", "Video Playing....");
+
+                }
+            });
+
             ((TextView) getView().findViewById(R.id.title_view))
                     .setText(movie.getTitle());
 
@@ -112,9 +125,6 @@ public class DetailFragment extends Fragment {
 
             ((TextView) getView().findViewById(R.id.synopsis_view))
                     .setText(movie.getOverview());
-
-
-            ((VideoView) getView().findViewById(R.id.trailer_view)).setVideoURI(null);
         }
     }
 

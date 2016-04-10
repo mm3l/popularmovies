@@ -3,6 +3,9 @@ package com.mmel.popularmovies.app.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * It represents a movie element got from TheMovieDB
  *
@@ -10,33 +13,37 @@ import android.os.Parcelable;
  */
 public class Movie implements Parcelable {
 
+    private int id;
     private String posterPath;
     private String backdrop_path;
     private String title;
     private String releaseDate;
     private double voteAverage;
     private String overview;
-    private String videos;
 
-    public Movie(String posterPath, String backdrop_path, String title, String releaseDate,
-                 double voteAverage, String overview /*String videos*/) {
+    private ArrayList<Trailer> trailers = new ArrayList<Trailer>();
+
+    public Movie(int id, String posterPath, String backdrop_path, String title, String releaseDate,
+                 double voteAverage, String overview) {
+        this.id = id;
         this.posterPath = posterPath;
         this.backdrop_path = backdrop_path;
         this.title = title;
         this.releaseDate = releaseDate;
         this.voteAverage = voteAverage;
         this.overview = overview;
-        this.videos = "";
     }
 
     protected Movie(Parcel in) {
+        id = in.readInt();
         posterPath = in.readString();
         backdrop_path = in.readString();
         title = in.readString();
         releaseDate = in.readString();
         voteAverage = in.readDouble();
         overview = in.readString();
-        videos = in.readString();
+
+        trailers = in.createTypedArrayList(Trailer.CREATOR);
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -58,13 +65,14 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(posterPath);
         dest.writeString(backdrop_path);
         dest.writeString(title);
         dest.writeString(releaseDate);
         dest.writeDouble(voteAverage);
         dest.writeString(overview);
-        dest.writeString(videos);
+        dest.writeTypedList(trailers);
     }
 
     public enum ImageSize {
@@ -83,6 +91,8 @@ public class Movie implements Parcelable {
             return mString;
         }
     }
+
+    public int getId() { return id; }
 
     public String getPosterPath() {
         return posterPath;
@@ -108,7 +118,10 @@ public class Movie implements Parcelable {
         return overview;
     }
 
-    public String getVideos() { return  videos; }
+    public List<Trailer> getTrailers() { return trailers; }
+
+    public void setTrailers(ArrayList<Trailer> trailers) { this.trailers = trailers; }
+
 
     /**
      * It returns a string representation of all local attributes
@@ -117,13 +130,20 @@ public class Movie implements Parcelable {
      * @return  a string representation of all local attributes
      */
     public String toString() {
-        String str = "Poster Path: " + getPosterPath() + " \n" +
-                "BackDrop Path: " + getBackdropPath() + " \n" +
-                "Original Title: " + getTitle() + " \n" +
-                "Release Date: " + getReleaseDate() + " \n" +
-                "Average Vote: " + getVoteAverage() + " \n" +
-                "Overview: " + getOverview() + " \n" +
-                "Videos: " + getVideos() + " \n";
-        return  str;
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("ID: " + getId() + " \n");
+        builder.append("Poster Path: " + getPosterPath() + " \n");
+        builder.append("BackDrop Path: " + getBackdropPath() + " \n");
+        builder.append("Original Title: " + getTitle() + " \n");
+        builder.append("Release Date: " + getReleaseDate() + " \n");
+        builder.append("Average Vote: " + getVoteAverage() + " \n");
+        builder.append("Overview: " + getOverview() + " \n");
+        builder.append("Videos: ");
+
+        for(int i = 0; i < getTrailers().size(); i++) {
+            builder.append(trailers.get(i).toString() + " \n");
+        }
+        return  builder.toString();
     }
 }

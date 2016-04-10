@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,9 +21,11 @@ import android.widget.Toast;
 import com.mmel.popularmovies.app.api.TheMovieDbApi;
 import com.mmel.popularmovies.app.data.CustomArrayAdapter;
 import com.mmel.popularmovies.app.data.Movie;
+import com.mmel.popularmovies.app.data.Trailer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 
 /**
@@ -122,8 +125,7 @@ public class MoviesFragment extends Fragment {
         FetchMoviesTask movieTask = new FetchMoviesTask();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sort_pref = prefs.getString(getString(R.string.pref_sort_key),
-                getString(R.string.pref_sort_popular));
+        String sort_pref = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_popular));
 
         //Log.d(LOG_TAG, "updateMovies(): " + "Selection: " + sort_pref);
 
@@ -140,6 +142,7 @@ public class MoviesFragment extends Fragment {
         protected ArrayList<Movie> doInBackground(String... params) {
 
             ArrayList<Movie> movies;
+            ArrayList<Trailer> trailers;
 
             TheMovieDbApi.SortOption sortOption = sortKeyMap.get(params[0]);
 
@@ -147,6 +150,14 @@ public class MoviesFragment extends Fragment {
 
             movies = api.discoverMovies(
                     sortOption != null ? sortOption : TheMovieDbApi.SortOption.SORT_BY_MOST_POPULAR);
+
+            for(int i = 0; i < movies.size(); i++) {
+                trailers = api.getMovieTrailers(movies.get(i).getId());
+
+                if(trailers != null) {
+                    movies.get(i).setTrailers(trailers);
+                }
+            }
 
             return (movies);
         }
