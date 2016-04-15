@@ -2,6 +2,7 @@ package com.mmel.popularmovies.app;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -21,7 +22,10 @@ import android.widget.VideoView;
 
 import com.mmel.popularmovies.app.api.TheMovieDbApi;
 import com.mmel.popularmovies.app.data.Movie;
+import com.mmel.popularmovies.app.data.Trailer;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 /**
  * It creates a details screen with additional movie information such as:
@@ -79,6 +83,10 @@ public class DetailFragment extends Fragment {
 
             if (data != null) {
                 movie = (Movie) data.getParcelable(DETAIL_MOVIE_KEY);
+
+                FetchTrailersTask trailersTask = new FetchTrailersTask();
+                trailersTask.execute(movie.getId());
+
                 Log.d(LOG_TAG, "Movie info: " + movie.toString());
             }
 
@@ -102,10 +110,9 @@ public class DetailFragment extends Fragment {
             backDropImgView.setOnClickListener(new View.OnClickListener() {
 
                 public void onClick(View v) {
-
-                    startActivity(new Intent(Intent.ACTION_VIEW, TheMovieDbApi.getTrailerUri(movie.getTrailers().get(0).getKey())));
-                    Log.d("Video", "Video Playing....");
-
+                    String key = movie.getTrailers().get(0).getKey();
+                    startActivity(new Intent(Intent.ACTION_VIEW, TheMovieDbApi.getTrailerUri(key)));
+                    Log.d(LOG_TAG, "Playing " + key);
                 }
             });
 
@@ -135,5 +142,35 @@ public class DetailFragment extends Fragment {
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, movie.toString());
         return shareIntent;
+    }
+
+    private class FetchTrailersTask extends AsyncTask<Integer, Void, ArrayList<Trailer>> {
+
+        private final String LOG_TAG = FetchTrailersTask.class.getSimpleName();
+
+        private TheMovieDbApi api = new TheMovieDbApi();
+
+        @Override
+        protected ArrayList<Trailer> doInBackground(Integer... params) {
+
+            ArrayList<Trailer> trailers;
+
+            trailers = api.getMovieTrailers(params[0]);
+
+            if(trailers != null)
+                movie.setTrailers(trailers);
+
+            return (trailers);
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Trailer> movieTrailers) {
+
+            /*if (movieTrailers != null) {
+                for (Trailer movieTrailer : movieTrailers) {
+                    Log.d(LOG_TAG, "FetchTrailersTask: " + movieTrailer.toString());
+                }
+            }*/
+        }
     }
 }

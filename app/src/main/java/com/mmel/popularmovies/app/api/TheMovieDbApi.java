@@ -79,7 +79,7 @@ public class TheMovieDbApi {
                 .appendQueryParameter(API_KEY, BuildConfig.THE_MOVIE_DB_API_KEY)
                 .build();
 
-        Log.d(LOG_TAG, "json query: " + uri.toString());
+        //Log.d(LOG_TAG, "json query: " + uri.toString());
 
         HttpRequest.Response response = HttpRequest.get(uri.toString());
 
@@ -91,7 +91,7 @@ public class TheMovieDbApi {
         try {
             discoverTrailersJson = response.json();
 
-            Log.d(LOG_TAG, "json response: " + discoverTrailersJson.toString());
+            //Log.d(LOG_TAG, "json response: " + discoverTrailersJson.toString());
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, ENDPOINT_MOVIE + " came back with invalid JSON: \n"

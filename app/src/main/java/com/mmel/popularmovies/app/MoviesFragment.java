@@ -142,7 +142,6 @@ public class MoviesFragment extends Fragment {
         protected ArrayList<Movie> doInBackground(String... params) {
 
             ArrayList<Movie> movies;
-            ArrayList<Trailer> trailers;
 
             TheMovieDbApi.SortOption sortOption = sortKeyMap.get(params[0]);
 
@@ -150,14 +149,6 @@ public class MoviesFragment extends Fragment {
 
             movies = api.discoverMovies(
                     sortOption != null ? sortOption : TheMovieDbApi.SortOption.SORT_BY_MOST_POPULAR);
-
-            for(int i = 0; i < movies.size(); i++) {
-                trailers = api.getMovieTrailers(movies.get(i).getId());
-
-                if(trailers != null) {
-                    movies.get(i).setTrailers(trailers);
-                }
-            }
 
             return (movies);
         }
